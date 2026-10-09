@@ -4,13 +4,11 @@
   "description": "The libjs ABI for WebAssembly addons",
   "exports": {
     "./package": "./package.json",
-    ".": "./index.js",
-    "./wasm.syms": "./wasm.syms"
+    ".": "./index.js"
   },
   "files": [
     "index.js",
-    "lib",
-    "wasm.syms"
+    "lib"
   ],
   "imports": {
     "fs": {

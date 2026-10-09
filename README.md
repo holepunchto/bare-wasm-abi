@@ -20,11 +20,11 @@ const exports = instantiate(bytes, {
 
 ## Building addons
 
-An addon is a WASI reactor that exports `bare_register_module_v0`, `malloc`, `free`, its memory, and its function table. It may only import the functions listed in `wasm.syms`. Passing that file to `wasm-ld --allow-undefined-file` makes any other import fail to link. `cmake-bare` builds addons this way for the `wasi-wasm32` target of `cmake-toolchains`.
+An addon is a WASI reactor that exports `bare_register_module_v0`, `malloc`, `free`, its memory, and its function table. Undefined functions become imports, and `instantiate()` rejects any import outside the ABI. `cmake-bare` builds addons this way for the `wasi-wasm32` target of `cmake-toolchains`.
 
 ## Generating the bindings
 
-`lib/abi.js`, `lib/constants.js`, and `wasm.syms` are generated from `js.h`. They hold the marshalling for each libjs function, the enums and wasm32 struct layouts, and the allowlist. The semantics of each function are written by hand in `lib/js.js`, along with the functions excluded by design.
+`lib/abi.js` and `lib/constants.js` are generated from `js.h`. They hold the marshalling for each libjs function and the enums and wasm32 struct layouts. The semantics of each function are written by hand in `lib/js.js`, along with the functions excluded by design.
 
 ```
 npm run generate

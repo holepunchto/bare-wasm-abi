@@ -26,8 +26,6 @@ list(JOIN include "\", \"" headers)
 
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/headers.json" "[\"${headers}\"]\n")
 
-# The test fixtures link like addons, so any import outside the allowlist fails
-# to link.
 file(GLOB fixtures CONFIGURE_DEPENDS test/fixtures/*.c)
 
 foreach(source IN LISTS fixtures)
@@ -41,16 +39,10 @@ foreach(source IN LISTS fixtures)
     ${name}
     PRIVATE
       -mexec-model=reactor
-      "-Wl,--allow-undefined-file=${CMAKE_CURRENT_SOURCE_DIR}/wasm.syms"
+      -Wl,--allow-undefined
       -Wl,--export=bare_register_module_v0
       -Wl,--export=malloc
       -Wl,--export=free
       -Wl,--export-table
-  )
-
-  set_target_properties(
-    ${name}
-    PROPERTIES
-    LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/wasm.syms"
   )
 endforeach()

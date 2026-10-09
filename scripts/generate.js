@@ -330,15 +330,6 @@ function emitConstants(enums, layouts) {
   )
 }
 
-function emitSymbols(functions, js) {
-  return (
-    functions
-      .filter((fn) => typeof js[fn.name.slice(3)] === 'function')
-      .map((fn) => fn.name)
-      .join('\n') + '\n'
-  )
-}
-
 function summarize(functions, js) {
   const missing = []
   let implemented = 0
@@ -402,8 +393,6 @@ async function main() {
   await write(path.join(lib, 'abi.js'), emitBindings(functions))
 
   const js = require(path.join(lib, 'js'))
-
-  fs.writeFileSync(path.join(root, 'wasm.syms'), emitSymbols(functions, js))
 
   console.log(summarize(functions, js))
 }
