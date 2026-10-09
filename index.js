@@ -1,3 +1,4 @@
+const wasm = require('bare-wasm')
 const WASI = require('bare-wasi')
 const Runtime = require('./lib/runtime')
 const bindings = require('./lib/abi')
@@ -12,10 +13,10 @@ const required = [
 ]
 
 module.exports = function instantiate(bytes, opts = {}) {
-  const module = new WebAssembly.Module(bytes)
+  const module = new wasm.Module(bytes)
 
   for (const name of required) {
-    if (!WebAssembly.Module.exports(module).some((entry) => entry.name === name)) {
+    if (!wasm.Module.exports(module).some((entry) => entry.name === name)) {
       throw new Error(`WebAssembly addon does not export '${name}'`)
     }
   }
@@ -31,7 +32,7 @@ module.exports = function instantiate(bytes, opts = {}) {
 
   const unsupported = []
 
-  for (const entry of WebAssembly.Module.imports(module)) {
+  for (const entry of wasm.Module.imports(module)) {
     if (entry.module === 'wasi_snapshot_preview1' && entry.name in wasi.wasiImport) continue
     if (entry.module === 'env' && entry.name in env) continue
 
@@ -46,7 +47,7 @@ module.exports = function instantiate(bytes, opts = {}) {
     )
   }
 
-  const instance = new WebAssembly.Instance(module, { env, ...wasi.getImportObject() })
+  const instance = new wasm.Instance(module, { env, ...wasi.getImportObject() })
 
   rt.attach(instance)
   wasi.initialize(instance)
@@ -61,7 +62,7 @@ module.exports = function instantiate(bytes, opts = {}) {
 
     result = handle === 0 ? target : rt.value(handle)
   } catch (err) {
-    if (err instanceof WebAssembly.RuntimeError) rt.crashed = err
+    if (err instanceof wasm.RuntimeError) rt.crashed = err
     throw err
   } finally {
     rt.closeScope(depth)
