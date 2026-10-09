@@ -1,6 +1,7 @@
 const { test, hook } = require('brittle')
 const fs = require('bare-fs')
 const path = require('bare-path')
+const wasm = require('bare-wasm')
 const instantiate = require('.')
 const Runtime = require('./lib/runtime')
 const { build, configure, compile } = require('./scripts/build')
@@ -101,7 +102,7 @@ test('a trap is contained to the addon instance', (t) => {
   const addon = load('trap')
   const other = load('values')
 
-  t.exception.all(() => addon.trap(), WebAssembly.RuntimeError)
+  t.exception.all(() => addon.trap(), wasm.RuntimeError)
   t.exception(() => addon.trap(), /WebAssembly addon has crashed/)
   t.is(other.add(1, 2), 3, 'other instances keep working')
 })
@@ -115,7 +116,7 @@ test('a module that is not an addon is rejected', (t) => {
 test('an unterminated string from the guest is rejected rather than scanned forever', (t) => {
   const rt = new Runtime()
 
-  rt.memory = new WebAssembly.Memory({ initial: 1 })
+  rt.memory = new wasm.Memory({ initial: 1 })
   new Uint8Array(rt.memory.buffer).fill(0x41)
 
   t.exception.all(() => rt.read.utf8(65536 - 4, rt.NUL_TERMINATED), /not NUL terminated/)
