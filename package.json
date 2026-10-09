@@ -1,0 +1,59 @@
+{
+  "name": "bare-wasm-abi",
+  "version": "0.0.0",
+  "description": "The libjs ABI for WebAssembly addons",
+  "exports": {
+    "./package": "./package.json",
+    ".": "./index.js",
+    "./wasm.syms": "./wasm.syms"
+  },
+  "files": [
+    "index.js",
+    "lib",
+    "wasm.syms"
+  ],
+  "imports": {
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
+    },
+    "path": {
+      "bare": "bare-path",
+      "default": "path"
+    }
+  },
+  "scripts": {
+    "generate": "node scripts/generate.js",
+    "format": "prettier --write . && lunte --fix",
+    "lint": "prettier --check . && lunte",
+    "test": "brittle-bare --coverage test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/bare-wasm-abi.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/bare-wasm-abi/issues"
+  },
+  "homepage": "https://github.com/holepunchto/bare-wasm-abi#readme",
+  "dependencies": {
+    "bare-type": "^1.4.0",
+    "bare-wasi": "^0.1.0"
+  },
+  "devDependencies": {
+    "bare-fs": "^4.4.4",
+    "bare-path": "^3.0.0",
+    "brittle": "^3.5.0",
+    "cmake-fetch": "^1.5.3",
+    "cmake-runtime": "^4.3.1",
+    "cmake-toolchains": "^2.1.0",
+    "llvm-runtime": "^23.1.2",
+    "lunte": "^1.8.4",
+    "ninja-runtime": "^1.13.2",
+    "prettier": "^3.4.2",
+    "prettier-config-holepunch": "^2.0.0",
+    "wasi-sysroot": "^0.1.1"
+  }
+}
