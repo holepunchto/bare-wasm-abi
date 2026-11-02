@@ -44,6 +44,7 @@
   "devDependencies": {
     "bare-fs": "^4.4.4",
     "bare-path": "^3.0.0",
+    "bare-subprocess": "^6.2.2",
     "brittle": "^3.5.0",
     "cmake-fetch": "^1.5.3",
     "cmake-runtime": "^4.3.1",

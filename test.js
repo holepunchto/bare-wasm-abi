@@ -2,6 +2,7 @@ const { test, hook } = require('brittle')
 const fs = require('bare-fs')
 const path = require('bare-path')
 const wasm = require('bare-wasm')
+const { spawnSync } = require('bare-subprocess')
 const instantiate = require('.')
 const Runtime = require('./lib/runtime')
 const { build, configure, compile } = require('./scripts/build')
@@ -105,6 +106,12 @@ test('a trap is contained to the addon instance', (t) => {
   t.exception.all(() => addon.trap(), wasm.RuntimeError)
   t.exception(() => addon.trap(), /WebAssembly addon has crashed/)
   t.is(other.add(1, 2), 3, 'other instances keep working')
+})
+
+test('teardown callbacks run in reverse order as Bare exits', (t) => {
+  const { stdout } = spawnSync(Bare.argv[0], [path.join(__dirname, 'test/fixtures/teardown.js')])
+
+  t.is(stdout.toString(), '3\n1\n')
 })
 
 test('a module that is not an addon is rejected', (t) => {
