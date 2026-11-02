@@ -18,6 +18,10 @@ const exports = instantiate(bytes, {
 
 `instantiate()` checks that the module is an addon and that it imports nothing outside the ABI, then registers it and returns its exports. The `wasi` options are passed on to `bare-wasi`, and an addon given none gets no capabilities. A trap inside the addon poisons only its own instance, and later calls into it throw.
 
+## Security
+
+`bare-wasm-abi` is designed for trusted addons that process untrusted input. A memory bug in an addon stays in the addon's linear memory, but an addon reaches everything JavaScript in the same realm can, so it is not a sandbox for untrusted addons. What the ABI does and does not promise is written down in [`docs/threat-model.md`](docs/threat-model.md), which embedders should read before loading addons.
+
 ## Building addons
 
 An addon is a WASI reactor that exports `bare_register_module_v0`, `malloc`, `free`, its memory, and its function table. Undefined functions become imports, and `instantiate()` rejects any import outside the ABI. `cmake-bare` builds addons this way for the `wasi-wasm32` target of `cmake-toolchains`.
