@@ -26,6 +26,19 @@ const exports = instantiate(bytes, {
 
 An addon is a WASI reactor that exports `bare_register_module_v0`, `malloc`, `free`, its memory, and its function table. Undefined functions become imports, and `instantiate()` rejects any import outside the ABI. `cmake-bare` builds addons this way for the `wasi-wasm32` target of `cmake-toolchains`.
 
+## Avoiding traps
+
+A trap poisons the addon for good, so an addon should handle its errors instead of trapping on them:
+
+- Throw JavaScript errors instead of calling `abort()` or `assert()`.
+- Check that `malloc()` did not return `NULL`.
+- Guard against division by zero.
+- Build with `-mnontrapping-fptoint` so float to integer conversions do not trap.
+- Call functions through pointers of their exact signature.
+- Bound recursion and keep large buffers off the stack.
+
+Most memory bugs do not trap at all, so also test the addon natively with sanitizers enabled.
+
 ## Generating the bindings
 
 `lib/abi.js` and `lib/constants.js` are generated from `js.h`. They hold the marshalling for each libjs function and the enums and wasm32 struct layouts. The semantics of each function are written by hand in `lib/js.js`, along with the functions excluded by design.
