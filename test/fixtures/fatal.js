@@ -10,7 +10,9 @@ const addon = instantiate(fs.readFileSync(path.join(__dirname, '../../build/real
 })
 
 Bare.on('uncaughtException', (err) => {
-  console.log(Realm.isFrom(err, realm.evaluate('globalThis')) ? 'realm' : 'host', err.message)
+  const origin = Realm.isFrom(err, realm.evaluate('globalThis')) ? 'realm' : 'host'
+
+  fs.writeSync(1, origin + ' ' + err.message + '\n')
 })
 
 addon.fatal("new Error('fatal')")
