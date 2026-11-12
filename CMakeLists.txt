@@ -15,7 +15,7 @@ fetch_package(
 )
 
 fetch_package(
-  "github:holepunchto/libjs#d143cf2"
+  "github:holepunchto/libjs#79b6aa0"
   SOURCE_DIR libjs
   SOURCE_SUBDIR fetch-only
 )
