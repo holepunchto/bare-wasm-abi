@@ -206,6 +206,85 @@ type_of(js_env_t *env, js_callback_info_t *info) {
   return result;
 }
 
+static js_value_t *
+is_detachable(js_env_t *env, js_callback_info_t *info) {
+  size_t argc = 1;
+  js_value_t *argv[1];
+  js_get_callback_info(env, info, &argc, argv, NULL, NULL);
+
+  bool detachable;
+  js_is_detachable_arraybuffer(env, argv[0], &detachable);
+
+  js_value_t *result;
+  js_get_boolean(env, detachable, &result);
+
+  return result;
+}
+
+static js_value_t *
+object_type(js_env_t *env, js_callback_info_t *info) {
+  size_t argc = 1;
+  js_value_t *argv[1];
+  js_get_callback_info(env, info, &argc, argv, NULL, NULL);
+
+  js_value_t *value = argv[0];
+
+  bool is_undefined;
+  js_is_undefined(env, value, &is_undefined);
+  if (is_undefined) js_create_external(env, NULL, NULL, NULL, &value);
+
+  js_object_type_t type;
+  if (js_get_object_type(env, value, &type) < 0) return NULL;
+
+  js_value_t *result;
+  js_create_uint32(env, type, &result);
+
+  return result;
+}
+
+static js_value_t *
+iterator_kind(js_env_t *env, js_callback_info_t *info) {
+  size_t argc = 1;
+  js_value_t *argv[1];
+  js_get_callback_info(env, info, &argc, argv, NULL, NULL);
+
+  bool is_map_iterator, is_set_iterator;
+  js_is_map_iterator(env, argv[0], &is_map_iterator);
+  js_is_set_iterator(env, argv[0], &is_set_iterator);
+
+  const char *kind = is_map_iterator ? "map" : is_set_iterator ? "set" : "none";
+
+  js_value_t *result;
+  js_create_string_utf8(env, (const utf8_t *) kind, -1, &result);
+
+  return result;
+}
+
+static js_value_t *
+observe(js_env_t *env, js_callback_info_t *info) {
+  size_t argc = 2;
+  js_value_t *argv[2];
+  js_get_callback_info(env, info, &argc, argv, NULL, NULL);
+
+  uint8_t *data;
+  js_get_typedarray_info(env, argv[0], NULL, (void **) &data, NULL, NULL, NULL);
+
+  data[0] = 1;
+
+  js_value_t *seen;
+  js_get_named_property(env, argv[1], "probe", &seen);
+
+  js_value_t *written;
+  js_create_uint32(env, data[1], &written);
+
+  js_value_t *elements[] = {seen, written};
+
+  js_value_t *result;
+  js_create_array_with_elements(env, elements, 2, &result);
+
+  return result;
+}
+
 js_value_t *
 bare_register_module_v0(js_env_t *env, js_value_t *exports) {
   struct {
@@ -222,6 +301,10 @@ bare_register_module_v0(js_env_t *env, js_value_t *exports) {
     {"fail", fail},
     {"fill", fill},
     {"typeOf", type_of},
+    {"isDetachable", is_detachable},
+    {"objectType", object_type},
+    {"iteratorKind", iterator_kind},
+    {"observe", observe},
   };
 
   for (size_t i = 0; i < sizeof(functions) / sizeof(functions[0]); i++) {
